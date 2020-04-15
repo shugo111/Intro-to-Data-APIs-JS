@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+  </head>
+  <body>
+    <canvas id="myChart" width="400" height="400"></canvas>
+
+    <script>
+      chartit();
+      async function chartit() {
+        const data = await getdata();
+        const ctx = document.getElementById("myChart").getContext("2d");
+        const myChart = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: data.xs,
+            datasets: [
+              {
+                label: "global temp",
+                data: data.ys,
+                fill: false,
+                backgroundColor: "rgba(255, 99, 132, 0.2)",
+                borderColor: "rgba(255, 99, 132, 1)",
+                borderWidth: 1,
+              },
+            ],
+          },
+        });
+      }
+      async function getdata() {
+        const xs = [];
+        const ys = [];
+        let response = await fetch("ZonAnn.Ts+dSST.csv");
+        let table = await response.text();
+        let rows = table.split("\n").splice("1");
+        rows.forEach((elt) => {
+          let row = elt.split(",");
+          let year = row[0];
+          let global = row[1];
+          console.log(year);
+          xs.push(year);
+          console.log(global);
+          ys.push(parseFloat(global) + 14);
+        });
+        return { xs, ys };
+      }
+    </script>
+  </body>
+</html>
